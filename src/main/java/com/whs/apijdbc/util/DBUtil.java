@@ -13,10 +13,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.whs.apijdbc.util.dto.ColumnDTO;
-import com.whs.apijdbc.util.dto.ForeignKeyDTO;
-import com.whs.apijdbc.util.dto.PKDTO;
-import com.whs.apijdbc.util.dto.TableDTO;
+import com.whs.apijdbc.util.dto.Column;
+import com.whs.apijdbc.util.dto.ForeignKey;
+import com.whs.apijdbc.util.dto.PK;
+import com.whs.apijdbc.util.dto.Table;
 
 public class DBUtil {
 
@@ -161,9 +161,9 @@ public class DBUtil {
 		return mapRet;
 	}
 
-	public TableDTO[] loadTables(Connection conn, String schema, String[] tableName, String[] types)
+	public static Table[] loadTables(Connection conn, String schema, String[] tableName, String[] types)
 			throws SQLException {
-		List<TableDTO> list = new ArrayList<TableDTO>();
+		List<Table> list = new ArrayList<Table>();
 		DatabaseMetaData dbmd = conn.getMetaData();
 		String table = "%";
 		if (tableName != null && tableName.length > 0) {
@@ -172,7 +172,7 @@ public class DBUtil {
 				while (rs.next()) {
 					if (rs.getString("TABLE_NAME").indexOf("$") > -1)
 						continue;
-					TableDTO tableDto = readResultSet(conn, rs, schema);
+					Table tableDto = readResultSet(conn, rs, schema);
 					list.add(tableDto);
 				}
 				rs.close();
@@ -182,12 +182,12 @@ public class DBUtil {
 			while (rs.next()) {
 				if (rs.getString("TABLE_NAME").indexOf("$") > -1)
 					continue;
-				TableDTO tableDto = readResultSet(conn, rs, schema);
+				Table tableDto = readResultSet(conn, rs, schema);
 				list.add(tableDto);
 			}
 			rs.close();
 		}
-		TableDTO[] ret = new TableDTO[list.size()];
+		Table[] ret = new Table[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
 		}
@@ -205,27 +205,27 @@ public class DBUtil {
 		return (String[]) list.toArray(new String[list.size()]);
 	}
 
-	private TableDTO readResultSet(Connection conn, ResultSet rs, String schema) throws SQLException {
-		TableDTO tableDto = new TableDTO();
+	private static Table readResultSet(Connection conn, ResultSet rs, String schema) throws SQLException {
+		Table tableDto = new Table();
 		tableDto.setTableSchem(rs.getString("TABLE_SCHEM"));
 		tableDto.setRemarks(rs.getString("REMARKS"));
 		tableDto.setTableName(rs.getString("TABLE_NAME"));
 		tableDto.setTableCat(rs.getString("TABLE_CAT"));
 		tableDto.setTableType(rs.getString("TABLE_TYPE"));
 
-		tableDto.setColumnDTO(listColumns(conn, schema, tableDto.getTableName()));
+		tableDto.setColumn(listColumns(conn, schema, tableDto.getTableName()));
 		tableDto.setExportedKey(listExportedKeys(conn, schema, tableDto.getTableName()));
 		tableDto.setImportedKey(listImportedKeys(conn, schema, tableDto.getTableName()));
-		tableDto.setPkDTO(listPK(conn, schema, tableDto.getTableName()));
+		tableDto.setPk(listPK(conn, schema, tableDto.getTableName()));
 		return tableDto;
 	}
 
-	public PKDTO[] listPK(Connection conn, String schema, String table) throws SQLException {
-		List<PKDTO> list = new ArrayList<PKDTO>();
+	public static PK[] listPK(Connection conn, String schema, String table) throws SQLException {
+		List<PK> list = new ArrayList<PK>();
 		DatabaseMetaData dbmd = conn.getMetaData();
 		ResultSet rs = dbmd.getPrimaryKeys(conn.getCatalog(), schema, table);
 		while (rs.next()) {
-			PKDTO pkDto = new PKDTO();
+			PK pkDto = new PK();
 			pkDto.setKeySeq(Integer.parseInt(rs.getString("KEY_SEQ")));
 			pkDto.setColumnName(rs.getString("COLUMN_NAME"));
 			pkDto.setPkName(rs.getString("PK_NAME"));
@@ -235,19 +235,19 @@ public class DBUtil {
 			list.add(pkDto);
 		}
 		rs.close();
-		PKDTO[] ret = new PKDTO[list.size()];
+		PK[] ret = new PK[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
 		}
 		return ret;
 	}
 
-	public ForeignKeyDTO[] listExportedKeys(Connection conn, String schema, String table) throws SQLException {
-		List<ForeignKeyDTO> list = new ArrayList<ForeignKeyDTO>();
+	public static ForeignKey[] listExportedKeys(Connection conn, String schema, String table) throws SQLException {
+		List<ForeignKey> list = new ArrayList<ForeignKey>();
 		DatabaseMetaData dbmd = conn.getMetaData();
 		ResultSet rs = dbmd.getExportedKeys(conn.getCatalog(), schema, table);
 		while (rs.next()) {
-			ForeignKeyDTO foreignKeyDto = new ForeignKeyDTO();
+			ForeignKey foreignKeyDto = new ForeignKey();
 			foreignKeyDto.setKeySeq(Integer.parseInt(rs.getString("KEY_SEQ")));
 			foreignKeyDto.setDeleteRule(Integer.parseInt(rs.getString("DELETE_RULE")));
 			foreignKeyDto.setFktableSchem(rs.getString("FKTABLE_SCHEM"));
@@ -265,19 +265,19 @@ public class DBUtil {
 			list.add(foreignKeyDto);
 		}
 		rs.close();
-		ForeignKeyDTO[] ret = new ForeignKeyDTO[list.size()];
+		ForeignKey[] ret = new ForeignKey[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
 		}
 		return ret;
 	}
 
-	public ForeignKeyDTO[] listImportedKeys(Connection conn, String schema, String table) throws SQLException {
-		List<ForeignKeyDTO> list = new ArrayList<ForeignKeyDTO>();
+	public static ForeignKey[] listImportedKeys(Connection conn, String schema, String table) throws SQLException {
+		List<ForeignKey> list = new ArrayList<ForeignKey>();
 		DatabaseMetaData dbmd = conn.getMetaData();
 		ResultSet rs = dbmd.getImportedKeys(conn.getCatalog(), schema, table);
 		while (rs.next()) {
-			ForeignKeyDTO foreignKeyDto = new ForeignKeyDTO();
+			ForeignKey foreignKeyDto = new ForeignKey();
 			foreignKeyDto.setKeySeq(Integer.parseInt(rs.getString("KEY_SEQ")));
 			foreignKeyDto.setDeleteRule(Integer.parseInt(rs.getString("DELETE_RULE")));
 			foreignKeyDto.setFktableSchem(rs.getString("FKTABLE_SCHEM"));
@@ -295,15 +295,15 @@ public class DBUtil {
 			list.add(foreignKeyDto);
 		}
 		rs.close();
-		ForeignKeyDTO[] ret = new ForeignKeyDTO[list.size()];
+		ForeignKey[] ret = new ForeignKey[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
 		}
 		return ret;
 	}
 
-	public ColumnDTO[] listColumns(Connection conn, String schema, String table) throws SQLException {
-		List<ColumnDTO> list = new ArrayList<ColumnDTO>();
+	public static Column[] listColumns(Connection conn, String schema, String table) throws SQLException {
+		List<Column> list = new ArrayList<Column>();
 		DatabaseMetaData dbmd = conn.getMetaData();
 		ResultSet rs = dbmd.getColumns(conn.getCatalog(), schema, table, null);
 		ResultSetMetaData meta = rs.getMetaData();
@@ -314,7 +314,7 @@ public class DBUtil {
 			permCols.add(name);
 		}
 		while (rs.next()) {
-			ColumnDTO columnDto = new ColumnDTO();
+			Column columnDto = new Column();
 			columnDto.setBufferLength(Integer.parseInt(rs.getString("BUFFER_LENGTH")));
 			if (rs.getString("CHAR_OCTET_LENGTH") != null)
 				columnDto.setCharOctetLength(Integer.parseInt(rs.getString("CHAR_OCTET_LENGTH")));
@@ -342,7 +342,7 @@ public class DBUtil {
 			list.add(columnDto);
 		}
 		rs.close();
-		ColumnDTO[] ret = new ColumnDTO[list.size()];
+		Column[] ret = new Column[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			ret[i] = list.get(i);
 		}

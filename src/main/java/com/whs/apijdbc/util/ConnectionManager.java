@@ -4,8 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.whs.apijdbc.util.dto.Table;
 
 @Component
 public class ConnectionManager {
@@ -20,6 +21,8 @@ public class ConnectionManager {
 		}
 		try {
 			connection=DriverManager.getConnection(url, usr, pwd);
+			Table[] tables =  DBUtil.loadTables(connection, null, null, null);
+			System.out.println(tables.length);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
