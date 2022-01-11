@@ -11,17 +11,17 @@ public class ForeignKey implements Serializable {
 	
 	private int keySeq;
 	private int deleteRule;
-	private String fktableSchem;
-	private String pktableName;
+	private String fkTableSchem;
+	private String pkTableName;
 	private int updateRule;
-	private String pktableSchem;
-	private String fkcolumnName;
-	private String pkcolumnName;
+	private String pkTableSchem;
+	private String fkColumnName;
+	private String pkColumnName;
 	private String pkName;
 	private int deferrability;
 	private String fkName;
-	private String pktableCat;
-	private String fktableCat;
-	private String fktableName;
+	private String pkTableCat;
+	private String fkTableCat;
+	private String fkTableName;
 		
 }
